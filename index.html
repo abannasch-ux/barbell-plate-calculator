@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Barbell Plate Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f2f2f0;
+    --surface:#ffffff;
+    --surface-2:#ececea;
+    --ink:#17191d;
+    --muted:#6e7278;
+    --line:#dededa;
+    --accent:#e65112;
+    --accent-ink:#ffffff;
+    --accent-soft:#fdeee6;
+    --good:#1a7a3d;
+    --warn:#9a6a00;
+    --warn-bg:#fff6d6;
+    --shadow:0 10px 30px rgba(0,0,0,.08);
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#101214;
+      --surface:#1a1d20;
+      --surface-2:#24282d;
+      --ink:#f2f2ee;
+      --muted:#9aa0a6;
+      --line:#2e3237;
+      --accent:#ff6a2b;
+      --accent-soft:#2d1d14;
+      --warn-bg:#2a2410;
+      --warn:#f0c75e;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Barlow", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  button,input{font:inherit}
+  button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]){min-height:44px}
+  .wrap{max-width:680px;margin:0 auto;padding:18px 16px 36px}
+  @media(min-width:720px){.wrap{padding:28px 20px 48px}}
+
+  /* Target */
+  .target-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:20px 18px 18px;
+    box-shadow:var(--shadow);
+  }
+  .label{
+    font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0;
+  }
+  .target-row{display:flex;align-items:stretch;gap:10px;margin-top:12px}
+  .step-btn{
+    width:52px;flex:0 0 52px;border-radius:12px;border:1px solid var(--line);
+    background:var(--surface-2);color:var(--ink);font-size:26px;font-weight:700;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .step-btn:active{transform:scale(.97)}
+  .target-input-wrap{
+    flex:1;display:flex;align-items:baseline;justify-content:center;gap:6px;
+    background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:6px 10px;min-width:0;
+  }
+  .target-input{
+    width:3.2ch;min-width:110px;max-width:180px;text-align:center;border:0;background:transparent;color:var(--ink);
+    font-family:"Barlow Condensed",sans-serif;font-size:64px;font-weight:700;line-height:1;letter-spacing:.01em;
+    outline:none;padding:0;appearance:textfield;-moz-appearance:textfield;
+  }
+  .target-input::-webkit-outer-spin-button,.target-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .unit{font-family:"Barlow Condensed",sans-serif;font-size:26px;font-weight:600;color:var(--muted)}
+  input[type=range]{width:100%;margin:16px 0 4px;accent-color:var(--accent);min-height:36px;cursor:pointer}
+  .range-ends{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);font-weight:600}
+  .quick-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .quick-btn{
+    flex:1 1 auto;min-width:56px;padding:8px 10px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;
+  }
+  .quick-btn.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+  /* Bar weight */
+  .bar-card{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 18px 18px}
+  .bar-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .bar-note{font-size:13.5px;color:var(--muted);line-height:1.4;margin:8px 0 0}
+  .chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{
+    padding:9px 13px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);
+    font-weight:700;font-size:15px;cursor:pointer;line-height:1.1;text-align:left;
+  }
+  .chip small{display:block;font-weight:600;font-size:11.5px;color:var(--muted);letter-spacing:.02em;margin-top:2px}
+  .chip.active{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+  .chip.active small{color:var(--accent)}
+  .custom-bar{display:flex;align-items:center;gap:8px;margin-top:12px}
+  .custom-bar label{font-size:14px;font-weight:600;color:var(--muted)}
+  .custom-bar input{
+    width:92px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);
+    color:var(--ink);font-weight:700;text-align:center;font-size:17px;
+  }
+
+  /* Visual */
+  .visual-card{
+    margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px;
+    padding:22px 14px 16px;box-shadow:var(--shadow);overflow:hidden;
+  }
+  .visual-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:0 4px}
+  .visual-head h2{font-size:15px;margin:0;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+  .visual-head span{font-size:13.5px;color:var(--muted);font-weight:600;white-space:nowrap}
+  .barbell-scroll{margin-top:8px;padding:10px 0 2px}
+  .barbell{
+    display:flex;align-items:center;justify-content:center;min-height:168px;width:100%;
+  }
+  .side{display:flex;align-items:center;flex:0 1 auto;min-width:0}
+  .side.left{flex-direction:row-reverse}
+  .plates{display:flex;align-items:center;gap:3px;flex:0 1 auto;min-width:0}
+  .side.left .plates{flex-direction:row-reverse}
+  .plate{
+    flex:0 1 auto;border-radius:6px;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:700;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14), inset 0 -10px 18px rgba(0,0,0,.22);
+    overflow:hidden;
+  }
+  .plate span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:12px;letter-spacing:.06em;line-height:1;white-space:nowrap}
+  .plate.p45{background:#23272e;width:28px;height:148px}
+  .plate.p35{background:#8a6d00;width:24px;height:132px}
+  .plate.p25{background:#1e6b3a;width:22px;height:116px}
+  .plate.p10{background:#5b6470;width:18px;height:88px}
+  .plate.p5{background:#8b939e;width:15px;height:68px}
+  .plate.p2{background:#b6bcc4;width:11px;height:54px;color:#222}
+  .plate.p2 span{font-size:10px}
+  .plate.p5 span,.plate.p10 span{font-size:11px}
+  .collar{width:10px;height:52px;background:#9aa0a6;border-radius:3px;flex:0 0 10px;margin:0 2px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+  .sleeve{height:14px;background:linear-gradient(180deg,#c7ccd1,#8f979f 55%,#6f777f);flex:0 0 18px;border-radius:2px}
+  .shaft{height:16px;background:linear-gradient(180deg,#d3d7db,#9aa1a8 55%,#767e86);flex:1 1 90px;min-width:54px;border-radius:3px;position:relative}
+  .shaft::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 10px, rgba(0,0,0,.05) 10px 11px)}
+  .empty-note{text-align:center;color:var(--muted);font-size:14.5px;font-weight:600;padding:0 8px 4px}
+  .visual-foot{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);font-weight:600;padding:8px 4px 0;border-top:1px solid var(--line);margin-top:10px}
+
+  /* Breakdown */
+  .breakdown{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px}
+  .breakdown h2{margin:0;font-size:20px;line-height:1.15}
+  .breakdown h2 strong{color:var(--accent)}
+  .per-side-list{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+  .per-side-list li{
+    display:flex;align-items:center;gap:12px;background:var(--surface-2);border-radius:12px;padding:10px 12px;
+  }
+  .dot{width:38px;height:38px;border-radius:50%;flex:0 0 38px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px}
+  .dot.d45{background:#23272e}.dot.d35{background:#8a6d00}.dot.d25{background:#1e6b3a}.dot.d10{background:#5b6470}.dot.d5{background:#8b939e}.dot.d2{background:#b6bcc4;color:#222;font-size:11px}
+  .li-main{flex:1;min-width:0}
+  .li-main b{font-size:17px}
+  .li-main span{display:block;font-size:13px;color:var(--muted);font-weight:600}
+  .li-count{font-family:"Barlow Condensed",sans-serif;font-size:28px;font-weight:700;line-height:1}
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+  .stat{background:var(--surface-2);border-radius:12px;padding:10px 10px 9px;text-align:center}
+  .stat b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:26px;line-height:1}
+  .stat span{display:block;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+  .alert{margin-top:12px;border-radius:12px;padding:12px 13px;font-size:14.5px;line-height:1.45;font-weight:600}
+  .alert.warn{background:var(--warn-bg);color:var(--warn)}
+  .alert.good{background:#e6f4ea;color:var(--good)}
+  @media (prefers-color-scheme: dark){.alert.good{background:#14261a}}
+  .alert:empty{display:none}
+
+  /* Inventory */
+  .inv{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 18px 18px}
+  .inv p{margin:6px 0 0;font-size:13.5px;color:var(--muted);line-height:1.45}
+  .inv-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .inv-btn{
+    padding:9px 13px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);
+    font-weight:700;font-size:15px;cursor:pointer;opacity:.55;
+  }
+  .inv-btn.on{opacity:1;color:var(--ink);border-color:var(--ink);background:var(--surface-2)}
+  .reset-btn{margin-top:14px;background:none;border:0;color:var(--accent);font-weight:700;cursor:pointer;padding:8px 4px;text-decoration:underline;text-underline-offset:3px}
+  .foot-note{font-size:13px;color:var(--muted);line-height:1.5;margin:16px 4px 0;text-align:center}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <!-- Target weight -->
+  <section class="target-card" aria-label="Target weight">
+    <p class="label">Target weight</p>
+    <div class="target-row">
+      <button class="step-btn" id="minusBtn" aria-label="Decrease weight by 5 pounds">−</button>
+      <div class="target-input-wrap">
+        <input class="target-input" id="targetInput" type="number" inputmode="decimal" min="0" max="1000" step="5" value="135" aria-label="Target weight in pounds">
+        <span class="unit">lb</span>
+      </div>
+      <button class="step-btn" id="plusBtn" aria-label="Increase weight by 5 pounds">+</button>
+    </div>
+    <input type="range" id="targetRange" min="25" max="405" step="5" value="135" aria-label="Slide to set target weight">
+    <div class="range-ends"><span>25 lb</span><span>405 lb</span></div>
+    <div class="quick-row" id="quickRow" role="group" aria-label="Common weights"></div>
+  </section>
+
+  <!-- Bar weight -->
+  <section class="bar-card" aria-label="Bar weight">
+    <div class="bar-head">
+      <p class="label">Bar / Starting weight</p>
+    </div>
+    <p class="bar-note">Planet Fitness Smith machine is marked 25 lb starting resistance — that's the default. Switch it if you're on a different bar.</p>
+    <div class="chip-row" id="barChips">
+      <button class="chip active" data-bar="25">25 lb<small>Smith · Planet Fitness</small></button>
+      <button class="chip" data-bar="45">45 lb<small>Olympic barbell</small></button>
+      <button class="chip" data-bar="35">35 lb<small>Women's Olympic</small></button>
+      <button class="chip" data-bar="15">15 lb<small>Technique bar</small></button>
+      <button class="chip" data-bar="0">0 lb<small>Plates only</small></button>
+    </div>
+    <div class="custom-bar">
+      <label for="customBar">Or set your own:</label>
+      <input id="customBar" type="number" inputmode="decimal" min="0" max="100" step="1" placeholder="—" aria-label="Custom bar weight in pounds">
+      <span style="font-weight:600;color:var(--muted)">lb</span>
+    </div>
+  </section>
+
+  <!-- Visual -->
+  <section class="visual-card" aria-label="Barbell diagram">
+    <div class="visual-head">
+      <h2>How it looks</h2>
+      <span id="visualTotal">135 lb total</span>
+    </div>
+    <div class="barbell-scroll">
+      <div class="barbell" id="barbell" aria-hidden="true"></div>
+      <p class="empty-note" id="emptyNote" hidden>Empty bar — no plates needed</p>
+    </div>
+    <div class="visual-foot"><span>◀ Left side</span><span>Same plates both ends</span><span>Right side ▶</span></div>
+  </section>
+
+  <!-- Breakdown -->
+  <section class="breakdown" aria-label="Plate breakdown">
+    <h2 id="breakdownTitle">Put on <strong>each side</strong></h2>
+    <ul class="per-side-list" id="perSideList"></ul>
+    <div id="alertBox" class="alert" aria-live="polite"></div>
+    <div class="summary-grid">
+      <div class="stat"><b id="statBar">25</b><span>Bar lb</span></div>
+      <div class="stat"><b id="statPerSide">55</b><span>Per side lb</span></div>
+      <div class="stat"><b id="statTotal">135</b><span>Total lb</span></div>
+    </div>
+  </section>
+
+  <!-- Inventory -->
+  <section class="inv" aria-label="Available plates">
+    <p class="label">Plates you have</p>
+    <p>Tap to turn a size off if your gym doesn't have it — the calculator will work around it.</p>
+    <div class="inv-row" id="invRow"></div>
+    <button class="reset-btn" id="resetBtn">Reset everything to 135 lb · 25 lb bar</button>
+  </section>
+
+  <p class="foot-note">Plates are loaded biggest first, closest to the middle. Always use collars / clips on a free bar.</p>
+</main>
+
+<script>
+(function(){
+  var PLATES = [45, 35, 25, 10, 5, 2.5];
+  var PLATE_CLASS = {45:'p45',35:'p35',25:'p25',10:'p10',5:'p5',2.5:'p2'};
+  var DOT_CLASS = {45:'d45',35:'d35',25:'d25',10:'d10',5:'d5',2.5:'d2'};
+  var QUICK = [65, 95, 115, 135, 185, 225, 275, 315];
+
+  var state = {
+    target: 135,
+    bar: 25,
+    enabled: {45:true,35:true,25:true,10:true,5:true,2.5:true}
+  };
+
+  var targetInput = document.getElementById('targetInput');
+  var targetRange = document.getElementById('targetRange');
+  var barbellEl = document.getElementById('barbell');
+  var emptyNote = document.getElementById('emptyNote');
+  var perSideList = document.getElementById('perSideList');
+  var alertBox = document.getElementById('alertBox');
+  var visualTotal = document.getElementById('visualTotal');
+  var customBar = document.getElementById('customBar');
+
+  function fmt(n){
+    // show integers without decimal, 2.5 style otherwise
+    return (Math.round(n*10)/10).toString().replace(/\.0$/,'');
+  }
+
+  function calc(){
+    var remainingPerSide = (state.target - state.bar) / 2;
+    var counts = {};
+    var expanded = [];
+    var usedPerSide = 0;
+    if (remainingPerSide > 0) {
+      var rem = remainingPerSide;
+      PLATES.forEach(function(p){
+        if (!state.enabled[p]) return;
+        var c = Math.floor((rem + 1e-9) / p);
+        if (c > 0) {
+          counts[p] = c;
+          usedPerSide += c * p;
+          rem -= c * p;
+          for (var i=0;i<c;i++) expanded.push(p);
+        }
+      });
+    }
+    var achieved = state.bar + usedPerSide * 2;
+    var diff = state.target - achieved;
+    return { counts: counts, expanded: expanded, perSide: usedPerSide, achieved: achieved, diff: diff, remainingPerSide: remainingPerSide };
+  }
+
+  function plateDiv(p){
+    var d = document.createElement('div');
+    d.className = 'plate ' + PLATE_CLASS[p];
+    var s = document.createElement('span');
+    s.textContent = fmt(p);
+    d.appendChild(s);
+    return d;
+  }
+
+  function render(){
+    var r = calc();
+
+    // Inputs sync (avoid fighting typing)
+    if (document.activeElement !== targetInput) targetInput.value = state.target;
+    if (document.activeElement !== targetRange) targetRange.value = Math.min(405, Math.max(25, state.target));
+
+    // Quick active
+    var qb = document.querySelectorAll('.quick-btn');
+    qb.forEach(function(b){
+      b.classList.toggle('active', parseFloat(b.dataset.w) === state.target);
+    });
+
+    // Barbell visual
+    barbellEl.innerHTML = '';
+    emptyNote.hidden = r.expanded.length !== 0;
+
+    function buildSide(isLeft){
+      var side = document.createElement('div');
+      side.className = 'side' + (isLeft ? ' left' : '');
+      var platesWrap = document.createElement('div');
+      platesWrap.className = 'plates';
+      // Largest closest to centre: for right side, DOM order largest->smallest left to right.
+      // For left side, CSS row-reverse handles mirroring.
+      r.expanded.forEach(function(p){ platesWrap.appendChild(plateDiv(p)); });
+      var collar = document.createElement('div'); collar.className = 'collar';
+      var sleeve = document.createElement('div'); sleeve.className = 'sleeve';
+      side.appendChild(platesWrap);
+      side.appendChild(collar);
+      side.appendChild(sleeve);
+      return side;
+    }
+    var shaft = document.createElement('div'); shaft.className = 'shaft';
+    barbellEl.appendChild(buildSide(true));
+    barbellEl.appendChild(shaft);
+    barbellEl.appendChild(buildSide(false));
+
+    // Slight shrink if very heavy so it never scrolls sideways on a phone
+    var totalPlatesWidth = r.expanded.reduce(function(a,p){
+      var w = p===45?31 : p===35?27 : p===25?25 : p===10?21 : p===5?18 : 14;
+      return a+w;
+    },0);
+    var est = totalPlatesWidth*2 + 130;
+    var containerW = barbellEl.clientWidth || 340;
+    var scale = est > containerW ? Math.max(0.62, containerW/est) : 1;
+    barbellEl.style.transform = scale < 1 ? 'scale(' + scale + ')' : '';
+
+    visualTotal.textContent = fmt(r.achieved) + ' lb total';
+
+    // Breakdown list
+    perSideList.innerHTML = '';
+    if (r.expanded.length === 0) {
+      var li = document.createElement('li');
+      li.innerHTML = '<div class="li-main"><b>Nothing — just the bar</b><span>No plates on either side</span></div>';
+      perSideList.appendChild(li);
+    } else {
+      PLATES.forEach(function(p){
+        if (!r.counts[p]) return;
+        var li = document.createElement('li');
+        var dot = document.createElement('div'); dot.className = 'dot ' + DOT_CLASS[p]; dot.textContent = fmt(p);
+        var main = document.createElement('div'); main.className = 'li-main';
+        main.innerHTML = '<b>' + fmt(p) + ' lb plate</b><span>' + fmt(p * r.counts[p]) + ' lb on this side · ' + (r.counts[p]*2) + ' plates total for both sides</span>';
+        var cnt = document.createElement('div'); cnt.className = 'li-count'; cnt.textContent = '× ' + r.counts[p];
+        li.appendChild(dot); li.appendChild(main); li.appendChild(cnt);
+        perSideList.appendChild(li);
+      });
+    }
+
+    // Alert
+    alertBox.className = 'alert';
+    if (state.target < state.bar) {
+      alertBox.classList.add('warn');
+      alertBox.textContent = 'That target is below the bar itself (' + fmt(state.bar) + ' lb). The lightest you can go is the empty bar.';
+    } else if (Math.abs(r.diff) < 0.001) {
+      alertBox.classList.add('good');
+      alertBox.textContent = 'Exact match — ' + fmt(r.perSide) + ' lb per side makes ' + fmt(r.achieved) + ' lb total.';
+    } else if (r.remainingPerSide > 0) {
+      alertBox.classList.add('warn');
+      alertBox.textContent = 'Can\'t hit ' + fmt(state.target) + ' lb exactly with these plates. Closest is ' + fmt(r.achieved) + ' lb — ' + fmt(Math.abs(r.diff)) + ' lb ' + (r.diff > 0 ? 'under' : 'over') + ' your target.';
+    } else {
+      alertBox.textContent = '';
+    }
+
+    document.getElementById('statBar').textContent = fmt(state.bar);
+    document.getElementById('statPerSide').textContent = fmt(r.perSide);
+    document.getElementById('statTotal').textContent = fmt(r.achieved);
+  }
+
+  function setTarget(v){
+    if (isNaN(v)) return;
+    state.target = Math.max(0, Math.min(1000, Math.round(v*10)/10));
+    render();
+  }
+  function setBar(v, fromCustom){
+    if (isNaN(v)) return;
+    state.bar = Math.max(0, Math.min(200, v));
+    // chip active state
+    var matched = false;
+    document.querySelectorAll('#barChips .chip').forEach(function(c){
+      var on = parseFloat(c.dataset.bar) === state.bar && !fromCustom;
+      if (on) matched = true;
+      c.classList.toggle('active', on);
+    });
+    if (!fromCustom) customBar.value = '';
+    render();
+  }
+
+  // Quick buttons
+  var quickRow = document.getElementById('quickRow');
+  QUICK.forEach(function(w){
+    var b = document.createElement('button');
+    b.className = 'quick-btn'; b.dataset.w = w; b.textContent = w;
+    b.setAttribute('aria-label', 'Set target to ' + w + ' pounds');
+    b.addEventListener('click', function(){ setTarget(w); });
+    quickRow.appendChild(b);
+  });
+
+  // Inventory buttons
+  var invRow = document.getElementById('invRow');
+  PLATES.forEach(function(p){
+    var b = document.createElement('button');
+    b.className = 'inv-btn on'; b.textContent = fmt(p) + ' lb';
+    b.setAttribute('aria-pressed','true');
+    b.addEventListener('click', function(){
+      state.enabled[p] = !state.enabled[p];
+      b.classList.toggle('on', state.enabled[p]);
+      b.setAttribute('aria-pressed', state.enabled[p] ? 'true' : 'false');
+      render();
+    });
+    invRow.appendChild(b);
+  });
+
+  document.getElementById('minusBtn').addEventListener('click', function(){ setTarget(state.target - 5); });
+  document.getElementById('plusBtn').addEventListener('click', function(){ setTarget(state.target + 5); });
+  targetInput.addEventListener('input', function(){ var v = parseFloat(targetInput.value); if(!isNaN(v)){ state.target = v; render(); } });
+  targetInput.addEventListener('change', function(){ setTarget(parseFloat(targetInput.value) || state.bar); });
+  targetRange.addEventListener('input', function(){ setTarget(parseFloat(targetRange.value)); });
+
+  document.querySelectorAll('#barChips .chip').forEach(function(c){
+    c.addEventListener('click', function(){ setBar(parseFloat(c.dataset.bar), false); });
+  });
+  customBar.addEventListener('input', function(){
+    var v = parseFloat(customBar.value);
+    if (!isNaN(v)) setBar(v, true);
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    state.enabled = {45:true,35:true,25:true,10:true,5:true,2.5:true};
+    document.querySelectorAll('.inv-btn').forEach(function(b){ b.classList.add('on'); b.setAttribute('aria-pressed','true'); });
+    state.target = 135;
+    setBar(25, false);
+    render();
+  });
+
+  window.addEventListener('resize', render);
+  render();
+})();
+</script>
+</body>
+</html>
